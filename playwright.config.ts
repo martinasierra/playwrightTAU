@@ -13,7 +13,7 @@ import baseEnvUrl from './utils/environmentBaseUrl';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
- // testDir: './tests',  // Test Directory
+  testDir: './tests',  // Test Directory
 
   /* Run tests in files in parallel */
   fullyParallel: true,
