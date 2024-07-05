@@ -1,9 +1,30 @@
 import { test, expect, type Page } from '@playwright/test';
-import { HomePage } from '../pages/home.page'
+import { HomePage } from '../pages/home.page';
+import {
+  BatchInfo,
+  Configuration,
+  EyesRunner,
+  ClassicRunner,
+  VisualGridRunner,
+  BrowserType,
+  DeviceName,
+  ScreenOrientation,
+  Eyes,
+  Target
+} from '@applitools/eyes-playwright';
 
 const URL = 'https://playwright.dev/';
-let homePage: HomePage; // I still don't understand this
+let homePage: HomePage; 
 //const homePage = new HomePage(page);
+
+// Applitools
+// export const USE_ULTRAFAST_GRID: boolean = true;
+export const USE_ULTRAFAST_GRID: boolean = false;
+export let Batch: BatchInfo;
+export let Config: Configuration;
+export let Runner: EyesRunner;
+let eyes: Eyes; //eyes is the class that actually perform the screenshot check for us when we need it
+// end of Applitools
 
 test.beforeEach(async ({page}) => {
     await page.goto(URL);    
