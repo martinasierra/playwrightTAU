@@ -19,12 +19,39 @@ let homePage: HomePage;
 
 // Applitools
 // export const USE_ULTRAFAST_GRID: boolean = true;
-export const USE_ULTRAFAST_GRID: boolean = false;
+export const USE_ULTRAFAST_GRID: boolean = false; //**The Ultrafast Grid will manage all the test execution in the cloud first, so if you want to run more browsers and devices, you can use that and Applitools will take care of everything. **
 export let Batch: BatchInfo;
 export let Config: Configuration;
 export let Runner: EyesRunner;
 let eyes: Eyes; //eyes is the class that actually perform the screenshot check for us when we need it
 // end of Applitools
+
+// beforeAll for Applitools
+test.beforeAll(async() => {
+
+  if (USE_ULTRAFAST_GRID) {
+      Runner = new VisualGridRunner({ testConcurrency: 1 });
+  }
+  else {
+      Runner = new ClassicRunner(); //you need to manage everything locally, so you don't pass any parameters, you need to run every single browser or device in the local machine.
+  }
+  
+  const runnerName = (USE_ULTRAFAST_GRID) ? 'Ultrafast Grid' : 'Classic runner';
+  Batch = new BatchInfo({name: `Playwright website - ${runnerName}`});
+  
+  Config = new Configuration();
+  // Config.setApiKey("<your-api-key>");
+  
+  Config.setBatch(Batch);
+  if (USE_ULTRAFAST_GRID) {
+      Config.addBrowser(800, 600, BrowserType.CHROME);
+      Config.addBrowser(1600, 1200, BrowserType.FIREFOX);
+      Config.addBrowser(1024, 768, BrowserType.SAFARI);
+      Config.addDeviceEmulation(DeviceName.iPhone_11, ScreenOrientation.PORTRAIT);
+      Config.addDeviceEmulation(DeviceName.Nexus_10, ScreenOrientation.LANDSCAPE);
+  }
+
+});
 
 test.beforeEach(async ({page}) => {
     await page.goto(URL);    
