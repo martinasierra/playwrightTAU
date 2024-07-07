@@ -37,7 +37,7 @@ test.beforeAll(async() => {
   }
   
   const runnerName = (USE_ULTRAFAST_GRID) ? 'Ultrafast Grid' : 'Classic runner';
-  Batch = new BatchInfo({name: `Playwright website - ${runnerName}`});
+  Batch = new BatchInfo({name: `Playwright website - ${runnerName}`}); //A batch is a collection of checkpoints for each test suite.
   
   Config = new Configuration();
   // Config.setApiKey("<your-api-key>");
@@ -58,34 +58,51 @@ test.beforeEach(async ({page}) => {
     homePage = new HomePage(page);
 })
 
+test.afterEach(async () => {
+  await eyes.close();
+});
+
+test.afterAll(async() => {
+  // forces Playwright to wait synchronously for all visual checkpoints to complete.
+  const results = await Runner.getAllTestResults();
+  console.log('Visual test results', results);
+});
+
 async function clickGetStarted(page: Page) {
-    await homePage.clickGetStarted();
+  await homePage.clickGetStarted();
 }
 
 test.describe('Playwright website', () => {
 
 test('has title', async ({ page }) => {
     await expect(page).toHaveTitle(/Playwright/);
+     // https://applitools.com/docs/api-ref/sdk-api/playwright/js-intro/checksettings
+     await eyes.check('Home page', Target.window().fully()); //Target.window, it'll consider only the view port  .fully, it will scroll and take the screenshot of the full page.
   });
   
   test('get started link', async ({ page }) => {
-    // Click the get started link. -- This is what it looks like before
-    //await page.getByRole('link', { name: 'Get started' }).click();
     await clickGetStarted(page);
-    // Expects page to have a heading with the name of Installation.
-    await expect(homePage.installationHeading).toBeVisible();
+    await expect(page).toHaveTitle(/Playwright/);
+    // https://applitools.com/docs/api-ref/sdk-api/playwright/js-intro/checksettings#region-match-levels
+    // Layout: Check only the layout and ignore actual text and graphics.
+    await eyes.check('Get Started page', Target.window().fully().layout());
   });
   
   test('check Java page', async ({ page }) => {
+    await test.step('Act', async () => {
     await clickGetStarted(page);
-    await page.getByText('Node.jsNode.jsPythonJava.NET').hover();
+    await homePage.languageHover.hover();
     await homePage.javaButton.click();
+  });    
+  await test.step('Assert', async () => {
     await expect(page).toHaveURL('https://playwright.dev/java/docs/intro');
     await expect(homePage.installingPWsubtitle).not.toBeVisible();
-    
-    //Because is a large text we declare it in a const
     const javaDescription = `Playwright is distributed as a set of Maven modules. The easiest way to use it is to add one dependency to your project's pom.xml as described below. If you're not familiar with Maven please refer to its documentation.`
     await expect(page.getByText(javaDescription)).toBeVisible();
+    // https://applitools.com/docs/api-ref/sdk-api/playwright/js-intro/checksettings#region-match-levels
+    // Ignore colors: Similar to the strict match level but ignores changes in colors.
+    await eyes.check('Java page', Target.window().fully().ignoreColors());
   });
-  
-});
+  });
+
+});    
