@@ -9,7 +9,7 @@
 
 
 <h4 align="center"> 
-	🚧  PlaywrightTAU 🚀 Under construction...  🚧
+	PlaywrightTAU 🚀 
 </h4> 
 
 <hr> 
